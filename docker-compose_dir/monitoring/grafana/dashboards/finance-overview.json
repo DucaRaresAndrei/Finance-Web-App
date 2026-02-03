@@ -1,0 +1,97 @@
+{
+  "id": null,
+  "title": "Finance API - Overview",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 2,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Requests / min (total)",
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "60 * sum(rate(http_server_requests_seconds_count{job=\"finance-api\", uri!~\"/actuator.*\"}[1m]))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Success 2xx / min",
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "60 * (sum(rate(http_server_requests_seconds_count{job=\"finance-api\", status=~\"2..\", uri!~\"/actuator.*\"}[1m])) OR on() vector(0))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Errors 4xx / min",
+      "gridPos": { "x": 0, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "60 * (sum(rate(http_server_requests_seconds_count{job=\"finance-api\", status=~\"4..\", uri!~\"/actuator.*\"}[1m])) OR on() vector(0))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Errors 5xx / min",
+      "gridPos": { "x": 12, "y": 8, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "60 * (sum(rate(http_server_requests_seconds_count{job=\"finance-api\", status=~\"5..\", uri!~\"/actuator.*\"}[1m])) OR on() vector(0))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "Latency p95 (ms)",
+      "gridPos": { "x": 0, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "1000 * histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job=\"finance-api\", uri!~\"/actuator.*\"}[10m])) by (le))",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "CPU % (process)",
+      "gridPos": { "x": 12, "y": 16, "w": 12, "h": 8 },
+      "targets": [
+        {
+          "expr": "100 * avg(process_cpu_usage{job=\"finance-api\"})",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "type": "stat",
+      "title": "Finance API UP",
+      "gridPos": { "x": 0, "y": 24, "w": 6, "h": 6 },
+      "targets": [
+        { "expr": "max_over_time(up{job=\"finance-api\"}[2m])", "refId": "A" }
+      ],
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"] } }
+    },
+    {
+      "type": "timeseries",
+      "title": "Top endpoints (RPS)",
+      "gridPos": { "x": 0, "y": 24, "w": 18, "h": 10 },
+      "targets": [
+        {
+          "expr": "topk(10, sum(rate(http_server_requests_seconds_count{job=\"finance-api\", uri!~\"/actuator.*\", uri!~\"/admin/monitoring.*\"}[1m])) by (uri, method))",
+          "refId": "A",
+          "legendFormat": "{{method}} {{uri}}"
+        }
+      ]
+    }
+  ]
+}

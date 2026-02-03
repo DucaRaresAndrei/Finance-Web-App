@@ -1,0 +1,168 @@
+version: "3.8"
+
+services:
+  db-service:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: finance
+      POSTGRES_USER: finance
+      POSTGRES_PASSWORD: financepass
+    volumes:
+      - finance-db-data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  auth-service:
+    image: quay.io/keycloak/keycloak:26.0
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - ./keycloak/import:/opt/keycloak/data/import
+    ports:
+      - "8081:8080"
+    networks:
+      - public-net
+      - backend-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  notification-service:
+    image: notification-service:latest
+    environment:
+      MAIL_ENABLED: "true"
+      MAIL_FROM: "your_mail@gmail.com"
+      MAIL_HOST: "smtp.gmail.com"
+      MAIL_PORT: "587"
+
+      # credentiale ascunse
+      MAIL_USERNAME_FILE: "/run/secrets/gmail_username"
+      MAIL_PASSWORD_FILE: "/run/secrets/gmail_app_password"
+
+      INTERNAL_TOKEN_FILE: "/run/secrets/internal_token"
+    secrets:
+      - gmail_username
+      - gmail_app_password
+      - internal_token
+    networks:
+      - backend-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  finance-ui:
+    image: finance-ui:latest
+    ports:
+      - "8084:80"
+    networks:
+      - public-net
+      - backend-net
+    deploy:
+      replicas: 1
+
+  finance-api:
+    image: finance-api:latest
+    depends_on:
+      - db-service
+      - auth-service
+      - notification-service
+    environment:
+      # DB
+      DB_HOST: db-service
+      DB_PORT: 5432
+      DB_NAME: finance
+      DB_USER: finance
+      DB_PASSWORD: financepass
+      # Keycloak
+      KEYCLOAK_HOST: auth-service
+      KEYCLOAK_PORT: 8080
+
+      # Notification service
+      NOTIF_HOST: notification-service
+      NOTIF_PORT: 8082
+
+      # token intern
+      NOTIF_INTERNAL_TOKEN_FILE: "/run/secrets/internal_token"
+    secrets:
+      - internal_token
+    ports:
+      - "8080:8080"
+    networks:
+      - backend-net
+      - public-net
+      - monitoring-net
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+
+  monitoring-prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - monitoring-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  monitoring-grafana:
+    image: grafana/grafana:latest
+    environment:
+      GF_SECURITY_ADMIN_USER: "admin@admin.com"
+      GF_SECURITY_ADMIN_PASSWORD: "admin"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - monitoring-net
+    ports:
+      - "3000:3000"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - backend-net
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+volumes:
+  finance-db-data:
+  keycloak-data:
+  grafana-data:
+
+networks:
+  public-net:
+    driver: overlay
+  backend-net:
+    driver: overlay
+  monitoring-net:
+    driver: overlay
+
+secrets:
+  gmail_username:
+    external: true
+  gmail_app_password:
+    external: true
+  internal_token:
+    external: true

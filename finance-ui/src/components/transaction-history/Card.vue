@@ -1,0 +1,106 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+
+type Tone = 'success' | 'error' | 'info'
+
+interface Props {
+  title: string
+  amount: number
+  icon?: string
+  tone?: Tone
+}
+const props = withDefaults(defineProps<Props>(), {
+  icon: 'mdi-currency-usd',
+  tone: 'info',
+})
+
+const formatted = computed(() => {
+  const sign = props.amount >= 0 ? '+' : '-';
+  const absoluteAmount = Math.abs(props.amount);
+  const formattedAmount = new Intl.NumberFormat('ro-RO', { style: 'currency', currency: 'RON', maximumFractionDigits: 0 }).format(absoluteAmount);
+  return `${sign}${formattedAmount}`;
+});
+
+const toneColor = computed(() => ({
+  success: '#22c55e', // verde
+  error:   '#ef4444', // roșu
+  info:    '#3b82f6', // albastru
+}[props.tone]))
+</script>
+
+<template>
+  <v-card class="stat-card" :style="{'--tone': toneColor}">
+    <v-card-text>
+      <div class="row-top">
+        <div class="title">{{ title }}</div>
+        <!--        <div class="icon-pill">-->
+        <!--          <v-icon :icon="props.icon" size="18" />-->
+        <!--        </div>-->
+      </div>
+
+      <div class="amount">
+        {{ formatted }}
+      </div>
+
+    </v-card-text>
+  </v-card>
+</template>
+
+<style scoped>
+.stat-card{
+  --tone: #3b82f6;
+  --bg1: color-mix(in oklab, var(--tone) 8%, #0b1220);
+  --bg2: color-mix(in oklab, var(--tone) 2%, #0b1220);
+  background: linear-gradient(160deg, var(--bg1), var(--bg2));
+  border: 2px solid rgba(255,255,255,.06);
+  border-radius: 16px;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+}
+.stat-card:hover{
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--tone) 55%, transparent);
+  box-shadow: 0 0 8px var(--tone);
+}
+.v-card-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px;
+}
+.row-top{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.title{
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:.2px;
+}
+.icon-pill{
+  width:34px;
+  height:34px;
+  border-radius:999px;
+  display:grid;
+  place-items:center;
+  background: color-mix(in oklab, var(--tone) 20%, #0b1220);
+  color: color-mix(in oklab, var(--tone) 80%, #ffffff);
+}
+.amount{
+  font-size: 1.6rem;
+  font-weight:600;
+  letter-spacing:.3px;
+  color: var(--tone);
+  margin: 2px 0 8px;
+}
+.row-bottom{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.period{
+  font-size:.75rem;
+  opacity:.8
+}
+</style>

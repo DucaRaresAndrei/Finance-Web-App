@@ -1,0 +1,1100 @@
+openapi: 3.0.1
+info:
+  description: OpenAPI specification
+  title: OpenApi
+  version: "1.0"
+servers:
+- description: default
+  url: /
+security:
+- bearerAuth: []
+paths:
+  /settings:
+    get:
+      operationId: getSettings
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SettingsRespDTO'
+          description: OK
+      tags:
+      - settings-controller
+      x-accepts: '*/*'
+    put:
+      operationId: updateSettings
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSettingsReqDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/SettingsRespDTO'
+          description: OK
+      tags:
+      - settings-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /friends/search:
+    post:
+      operationId: searchFriends
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SearchFriendRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/FriendResponseDTO'
+                type: array
+          description: OK
+      tags:
+      - friend-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /friends/add:
+    post:
+      operationId: addFriend
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFriendRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/FriendResponseDTO'
+          description: OK
+      tags:
+      - friend-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /firms:
+    post:
+      operationId: listFirms
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FirmListRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/FirmDTO'
+                type: array
+          description: OK
+      tags:
+      - firm-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /firms/upgrade:
+    post:
+      operationId: upgradeToFirm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpgradeFirmRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: OK
+      tags:
+      - firm-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /expense:
+    post:
+      operationId: createExpense
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PairExpenseIncome'
+          description: OK
+      tags:
+      - expense-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /card/topup:
+    post:
+      operationId: topup
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TopupRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: OK
+      tags:
+      - card-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /auth/register:
+    post:
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequestDTO'
+        required: true
+      responses:
+        "200":
+          description: OK
+      tags:
+      - auth-controller
+      x-content-type: application/json
+      x-accepts: application/json
+  /auth/logout:
+    post:
+      operationId: logout
+      requestBody:
+        content:
+          application/json:
+            schema:
+              additionalProperties:
+                type: string
+              type: object
+        required: true
+      responses:
+        "200":
+          description: OK
+      tags:
+      - auth-controller
+      x-content-type: application/json
+      x-accepts: application/json
+  /auth/login:
+    post:
+      operationId: login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequestDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                additionalProperties:
+                  type: object
+                type: object
+          description: OK
+      tags:
+      - auth-controller
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /user:
+    get:
+      operationId: getCurrentUser
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserResponseDTO'
+          description: OK
+      tags:
+      - user-controller
+      x-accepts: '*/*'
+  /history:
+    get:
+      operationId: getHistory
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/HistorySummaryDTO'
+          description: OK
+      tags:
+      - history-controller
+      x-accepts: '*/*'
+  /history/recent/users:
+    get:
+      operationId: getRecentUserTransactions
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/TransactionDTO'
+                type: array
+          description: OK
+      tags:
+      - history-controller
+      x-accepts: '*/*'
+  /history/recent/firms:
+    get:
+      operationId: getRecentFirmPayments
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/TransactionDTO'
+                type: array
+          description: OK
+      tags:
+      - history-controller
+      x-accepts: '*/*'
+  /friends:
+    get:
+      operationId: getFriends
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/FriendResponseDTO'
+                type: array
+          description: OK
+      tags:
+      - friend-controller
+      x-accepts: '*/*'
+  /alerts/low-balance:
+    get:
+      operationId: checkLowBalance
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LowBalanceAlertDTO'
+          description: OK
+      tags:
+      - alert-controller
+      x-accepts: '*/*'
+  /card:
+    delete:
+      operationId: deleteCard
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Unit'
+          description: OK
+      tags:
+      - card-controller
+      x-accepts: '*/*'
+  /stats:
+    delete:
+      operationId: getDashboardStats_5
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+    get:
+      operationId: getDashboardStats
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+    head:
+      operationId: getDashboardStats_1
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+    options:
+      operationId: getDashboardStats_6
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+    patch:
+      operationId: getDashboardStats_4
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+    post:
+      operationId: getDashboardStats_2
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+    put:
+      operationId: getDashboardStats_3
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          default: 0
+          format: int32
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/DashboardStatsDTO'
+          description: OK
+      tags:
+      - stats-controller
+      x-accepts: '*/*'
+components:
+  schemas:
+    UpdateSettingsReqDTO:
+      example:
+        lowBalanceEnabled: true
+        lowBalanceThreshold: 0.8008281904610115
+        newPin: newPin
+      properties:
+        lowBalanceEnabled:
+          type: boolean
+        lowBalanceThreshold:
+          type: number
+        newPin:
+          type: string
+      type: object
+    SettingsRespDTO:
+      example:
+        lowBalanceEnabled: true
+        lowBalanceThreshold: 0.8008281904610115
+        hasPinSet: true
+      properties:
+        lowBalanceEnabled:
+          type: boolean
+        lowBalanceThreshold:
+          type: number
+        hasPinSet:
+          type: boolean
+      required:
+      - hasPinSet
+      - lowBalanceEnabled
+      - lowBalanceThreshold
+      type: object
+    SearchFriendRequestDTO:
+      example:
+        nameOrMail: nameOrMail
+      properties:
+        nameOrMail:
+          type: string
+      required:
+      - nameOrMail
+      type: object
+    FriendResponseDTO:
+      example:
+        iban: iban
+        fullName: fullName
+        email: email
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        iban:
+          type: string
+      required:
+      - email
+      - fullName
+      - iban
+      type: object
+    AddFriendRequestDTO:
+      example:
+        iban: iban
+      properties:
+        iban:
+          type: string
+      required:
+      - iban
+      type: object
+    FirmListRequestDTO:
+      example:
+        category: BILLS
+      properties:
+        category:
+          enum:
+          - BILLS
+          - ENTERTAINMENT
+          - FOOD
+          - SHOPPING
+          - TRANSPORTATION
+          - USER
+          type: string
+      type: object
+    FirmDTO:
+      example:
+        iban: iban
+        fullName: fullName
+        category: BILLS
+        email: email
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        category:
+          enum:
+          - BILLS
+          - ENTERTAINMENT
+          - FOOD
+          - SHOPPING
+          - TRANSPORTATION
+          - USER
+          type: string
+        iban:
+          type: string
+      required:
+      - category
+      - email
+      - fullName
+      - iban
+      type: object
+    UpgradeFirmRequestDTO:
+      example:
+        category: BILLS
+      properties:
+        category:
+          enum:
+          - BILLS
+          - ENTERTAINMENT
+          - FOOD
+          - SHOPPING
+          - TRANSPORTATION
+          - USER
+          type: string
+      required:
+      - category
+      type: object
+    Unit:
+      type: object
+    ExpenseRequestDTO:
+      example:
+        amount: 0.8008281904610115
+        pin: pin
+        description: description
+        ibanReceiver: ibanReceiver
+      properties:
+        description:
+          type: string
+        amount:
+          type: number
+        ibanReceiver:
+          type: string
+        pin:
+          type: string
+      required:
+      - amount
+      - description
+      - ibanReceiver
+      type: object
+    Expense:
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        amount: 0.8008281904610115
+        description: description
+        id: id
+        category: BILLS
+        ibanSender: ibanSender
+        ibanReceiver: ibanReceiver
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        amount:
+          type: number
+        date:
+          format: date-time
+          type: string
+        ibanReceiver:
+          type: string
+        ibanSender:
+          type: string
+        category:
+          enum:
+          - BILLS
+          - ENTERTAINMENT
+          - FOOD
+          - SHOPPING
+          - TRANSPORTATION
+          - USER
+          type: string
+      required:
+      - amount
+      - category
+      - date
+      - description
+      - ibanReceiver
+      - ibanSender
+      type: object
+    Income:
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        amount: 6.027456183070403
+        description: description
+        id: id
+        ibanSender: ibanSender
+        ibanReceiver: ibanReceiver
+      properties:
+        id:
+          type: string
+        amount:
+          type: number
+        description:
+          type: string
+        date:
+          format: date-time
+          type: string
+        ibanSender:
+          type: string
+        ibanReceiver:
+          type: string
+      required:
+      - amount
+      - date
+      - description
+      - ibanReceiver
+      - ibanSender
+      type: object
+    PairExpenseIncome:
+      example:
+        first:
+          date: 2000-01-23T04:56:07.000+00:00
+          amount: 0.8008281904610115
+          description: description
+          id: id
+          category: BILLS
+          ibanSender: ibanSender
+          ibanReceiver: ibanReceiver
+        second:
+          date: 2000-01-23T04:56:07.000+00:00
+          amount: 6.027456183070403
+          description: description
+          id: id
+          ibanSender: ibanSender
+          ibanReceiver: ibanReceiver
+      properties:
+        first:
+          $ref: '#/components/schemas/Expense'
+        second:
+          $ref: '#/components/schemas/Income'
+      required:
+      - first
+      - second
+      type: object
+    TopupRequestDTO:
+      example:
+        amount: 0.8008281904610115
+        description: description
+      properties:
+        amount:
+          type: number
+        description:
+          type: string
+      required:
+      - amount
+      type: object
+    RegisterRequestDTO:
+      example:
+        password: password
+        fullName: fullName
+        email: email
+      properties:
+        email:
+          type: string
+        fullName:
+          type: string
+        password:
+          type: string
+      required:
+      - email
+      - fullName
+      - password
+      type: object
+    LoginRequestDTO:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+      - password
+      - username
+      type: object
+    AccountResponseDTO:
+      example:
+        balance: 2.3021358869347655
+        iban: iban
+        history:
+          totalExpenses: 5.962133916683182
+          totalIncomes: 1.4658129805029452
+          lastTransactions:
+          - date: 2000-01-23T04:56:07.000+00:00
+            amount: 5.637376656633329
+            fromOrTo: fromOrTo
+            description: description
+            type: INCOME
+            ibanSender: ibanSender
+            ibanReceiver: ibanReceiver
+          - date: 2000-01-23T04:56:07.000+00:00
+            amount: 5.637376656633329
+            fromOrTo: fromOrTo
+            description: description
+            type: INCOME
+            ibanSender: ibanSender
+            ibanReceiver: ibanReceiver
+        category: BILLS
+        card:
+          cvvNumber: cvvNumber
+          id: id
+          cardNumber: cardNumber
+          cardNumberMasked: cardNumberMasked
+          expirationDate:
+            month: JANUARY
+            year: 0
+            monthValue: 6
+            leapYear: true
+      properties:
+        card:
+          $ref: '#/components/schemas/CardResponseDTO'
+        history:
+          $ref: '#/components/schemas/HistorySummaryDTO'
+        category:
+          enum:
+          - BILLS
+          - ENTERTAINMENT
+          - FOOD
+          - SHOPPING
+          - TRANSPORTATION
+          - USER
+          type: string
+        iban:
+          type: string
+        balance:
+          type: number
+      required:
+      - balance
+      - category
+      - iban
+      type: object
+    CardResponseDTO:
+      example:
+        cvvNumber: cvvNumber
+        id: id
+        cardNumber: cardNumber
+        cardNumberMasked: cardNumberMasked
+        expirationDate:
+          month: JANUARY
+          year: 0
+          monthValue: 6
+          leapYear: true
+      properties:
+        id:
+          type: string
+        cardNumberMasked:
+          type: string
+        cardNumber:
+          type: string
+        expirationDate:
+          $ref: '#/components/schemas/CardResponseDTO_expirationDate'
+        cvvNumber:
+          type: string
+      required:
+      - cardNumber
+      - cardNumberMasked
+      - cvvNumber
+      - expirationDate
+      - id
+      type: object
+    HistorySummaryDTO:
+      example:
+        totalExpenses: 5.962133916683182
+        totalIncomes: 1.4658129805029452
+        lastTransactions:
+        - date: 2000-01-23T04:56:07.000+00:00
+          amount: 5.637376656633329
+          fromOrTo: fromOrTo
+          description: description
+          type: INCOME
+          ibanSender: ibanSender
+          ibanReceiver: ibanReceiver
+        - date: 2000-01-23T04:56:07.000+00:00
+          amount: 5.637376656633329
+          fromOrTo: fromOrTo
+          description: description
+          type: INCOME
+          ibanSender: ibanSender
+          ibanReceiver: ibanReceiver
+      properties:
+        totalIncomes:
+          type: number
+        totalExpenses:
+          type: number
+        lastTransactions:
+          items:
+            $ref: '#/components/schemas/TransactionDTO'
+          type: array
+      required:
+      - lastTransactions
+      - totalExpenses
+      - totalIncomes
+      type: object
+    TransactionDTO:
+      example:
+        date: 2000-01-23T04:56:07.000+00:00
+        amount: 5.637376656633329
+        fromOrTo: fromOrTo
+        description: description
+        type: INCOME
+        ibanSender: ibanSender
+        ibanReceiver: ibanReceiver
+      properties:
+        type:
+          enum:
+          - INCOME
+          - EXPENSE
+          type: string
+        amount:
+          type: number
+        description:
+          type: string
+        ibanSender:
+          type: string
+        ibanReceiver:
+          type: string
+        date:
+          format: date-time
+          type: string
+        fromOrTo:
+          type: string
+      required:
+      - amount
+      - date
+      - fromOrTo
+      - type
+      type: object
+    UserResponseDTO:
+      example:
+        fullName: fullName
+        email: email
+        account:
+          balance: 2.3021358869347655
+          iban: iban
+          history:
+            totalExpenses: 5.962133916683182
+            totalIncomes: 1.4658129805029452
+            lastTransactions:
+            - date: 2000-01-23T04:56:07.000+00:00
+              amount: 5.637376656633329
+              fromOrTo: fromOrTo
+              description: description
+              type: INCOME
+              ibanSender: ibanSender
+              ibanReceiver: ibanReceiver
+            - date: 2000-01-23T04:56:07.000+00:00
+              amount: 5.637376656633329
+              fromOrTo: fromOrTo
+              description: description
+              type: INCOME
+              ibanSender: ibanSender
+              ibanReceiver: ibanReceiver
+          category: BILLS
+          card:
+            cvvNumber: cvvNumber
+            id: id
+            cardNumber: cardNumber
+            cardNumberMasked: cardNumberMasked
+            expirationDate:
+              month: JANUARY
+              year: 0
+              monthValue: 6
+              leapYear: true
+      properties:
+        fullName:
+          type: string
+        email:
+          type: string
+        account:
+          $ref: '#/components/schemas/AccountResponseDTO'
+      required:
+      - email
+      - fullName
+      type: object
+    LowBalanceAlertDTO:
+      example:
+        balance: 0.8008281904610115
+        message: message
+        shouldAlert: true
+      properties:
+        shouldAlert:
+          type: boolean
+        message:
+          type: string
+        balance:
+          type: number
+      required:
+      - shouldAlert
+      type: object
+    CategorySpendingDTO:
+      example:
+        total: 5.637376656633329
+        category: BILLS
+      properties:
+        category:
+          enum:
+          - BILLS
+          - ENTERTAINMENT
+          - FOOD
+          - SHOPPING
+          - TRANSPORTATION
+          - USER
+          type: string
+        total:
+          type: number
+      required:
+      - category
+      - total
+      type: object
+    DashboardStatsDTO:
+      example:
+        monthSummary:
+          incomes: 0.8008281904610115
+          expense: 6.027456183070403
+          netSavings: 1.4658129805029452
+        spendingByCategory:
+        - total: 5.637376656633329
+          category: BILLS
+        - total: 5.637376656633329
+          category: BILLS
+        weekSummary:
+          incomes: 0.8008281904610115
+          expense: 6.027456183070403
+          netSavings: 1.4658129805029452
+        weeklySpending:
+        - total: 5.962133916683182
+          day: day
+        - total: 5.962133916683182
+          day: day
+      properties:
+        monthSummary:
+          $ref: '#/components/schemas/SummaryDTO'
+        weekSummary:
+          $ref: '#/components/schemas/SummaryDTO'
+        weeklySpending:
+          items:
+            $ref: '#/components/schemas/WeeklyBarDTO'
+          type: array
+        spendingByCategory:
+          items:
+            $ref: '#/components/schemas/CategorySpendingDTO'
+          type: array
+      required:
+      - monthSummary
+      - spendingByCategory
+      - weekSummary
+      - weeklySpending
+      type: object
+    SummaryDTO:
+      example:
+        incomes: 0.8008281904610115
+        expense: 6.027456183070403
+        netSavings: 1.4658129805029452
+      properties:
+        incomes:
+          type: number
+        expense:
+          type: number
+        netSavings:
+          type: number
+      required:
+      - expense
+      - incomes
+      - netSavings
+      type: object
+    WeeklyBarDTO:
+      example:
+        total: 5.962133916683182
+        day: day
+      properties:
+        day:
+          type: string
+        total:
+          type: number
+      required:
+      - day
+      - total
+      type: object
+    CardResponseDTO_expirationDate:
+      example:
+        month: JANUARY
+        year: 0
+        monthValue: 6
+        leapYear: true
+      properties:
+        year:
+          format: int32
+          type: integer
+        month:
+          enum:
+          - JANUARY
+          - FEBRUARY
+          - MARCH
+          - APRIL
+          - MAY
+          - JUNE
+          - JULY
+          - AUGUST
+          - SEPTEMBER
+          - OCTOBER
+          - NOVEMBER
+          - DECEMBER
+          type: string
+        monthValue:
+          format: int32
+          type: integer
+        leapYear:
+          type: boolean
+      type: object
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      in: header
+      scheme: bearer
+      type: http
+

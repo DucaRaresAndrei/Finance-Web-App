@@ -1,0 +1,137 @@
+version: '3.8'
+
+services:
+  db-service:
+    image: postgres:16-alpine
+    container_name: db-service
+    environment:
+      POSTGRES_DB: finance
+      POSTGRES_USER: finance
+      POSTGRES_PASSWORD: financepass
+    ports:
+      - "5433:5432"
+    volumes:
+      - finance-db-data:/var/lib/postgresql/data
+    networks:
+      - backend-net
+
+  auth-service:
+    image: quay.io/keycloak/keycloak:26.0
+    container_name: auth-service
+    command: [ "start-dev", "--import-realm" ]
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    volumes:
+      - ./keycloak/import:/opt/keycloak/data/import
+      - keycloak-data:/opt/keycloak/data
+    ports:
+      - "8081:8080"
+    networks:
+      - public-net
+      - backend-net
+
+  notification-service:
+    build: ../notification-service
+    container_name: notification-service
+    environment:
+      MAIL_ENABLED: "true"
+      MAIL_FROM: "your_mail@gmail.com"
+      MAIL_HOST: "smtp.gmail.com"
+      MAIL_PORT: "587"
+      MAIL_USERNAME: "your_mail@gmail.com"
+      MAIL_PASSWORD: "16letterspass"
+      INTERNAL_TOKEN: "dev-internal-token"
+    networks:
+      - backend-net
+    ports:
+      - "8082:8082"
+
+  finance-ui:
+    build: ../finance-ui
+    container_name: finance-ui
+    ports:
+      - "8084:80"
+    networks:
+      - public-net
+      - backend-net
+
+  finance-api:
+    build: ../finance
+    container_name: finance-api
+    depends_on:
+      - db-service
+      - auth-service
+      - notification-service
+    environment:
+      # DB
+      DB_HOST: db-service
+      DB_PORT: 5432
+      DB_NAME: finance
+      DB_USER: finance
+      DB_PASSWORD: financepass
+      # Keycloak
+      KEYCLOAK_HOST: auth-service
+      KEYCLOAK_PORT: 8080
+      #KEYCLOAK_JWKS_URI: http://auth-service:8080/realms/finance/protocol/openid-connect/certs
+
+      NOTIF_HOST: notification-service
+      NOTIF_PORT: 8082
+      NOTIF_INTERNAL_TOKEN: "dev-internal-token"
+    ports:
+      - "8080:8080" # expus pentru Postman
+      - "8083:8083" # pentru testing din host
+    networks:
+      - backend-net
+      - monitoring-net
+
+  monitoring-prometheus:
+    image: prom/prometheus:latest
+    container_name: monitoring-prometheus
+    volumes:
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - monitoring-net
+    ports:
+      - "9090:9090"
+
+  monitoring-grafana:
+    image: grafana/grafana:latest
+    container_name: monitoring-grafana
+    environment:
+      GF_SECURITY_ADMIN_USER: "admin@admin.com"
+      GF_SECURITY_ADMIN_PASSWORD: "admin"
+      GF_SECURITY_ALLOW_EMBEDDING: "true"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks:
+      - monitoring-net
+    ports:
+      - "3000:3000"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: finance-pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    networks:
+      - backend-net
+
+volumes:
+  finance-db-data:
+  keycloak-data:
+  grafana-data:
+
+networks:
+  public-net:
+    driver: bridge
+  backend-net:
+    driver: bridge
+  monitoring-net:
+    driver: bridge

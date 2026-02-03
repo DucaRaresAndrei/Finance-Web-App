@@ -1,0 +1,8 @@
+package com.app.finance.models.requests
+
+import java.math.BigDecimal
+
+data class TopupRequestDTO(
+    val amount: BigDecimal,
+    val description: String? = null
+)
